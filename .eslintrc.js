@@ -1,6 +1,4 @@
 module.exports = {
-  // 继承预设包
-  extends: ['@lobehub/lint'],
   // 覆盖或新增规则
   rules: {
     'react/jsx-sort-props': 'off', // 关闭属性排序规则

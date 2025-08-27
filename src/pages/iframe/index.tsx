@@ -23,10 +23,10 @@ const Render = memo(() => {
 
   return (
     // 使用一个 flex 容器来更好地布局
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', height: '100vh', boxSizing: 'border-box' }}>
+    <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', height: '100vh', padding: '16px' }}>
       {/* 1. 控制按钮区域 */}
-      <div style={{ marginBottom: '16px', display: 'flex', gap: '8px', flexShrink: 0 }}>
-        <Button type="primary" onClick={loadMockData}>
+      <div style={{ display: 'flex', flexShrink: 0, gap: '8px', marginBottom: '16px' }}>
+        <Button onClick={loadMockData} type="primary">
           加载/重置模拟图表
         </Button>
         <Button onClick={clearChart}>

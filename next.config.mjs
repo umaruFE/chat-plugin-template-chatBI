@@ -5,7 +5,10 @@ const nextConfig = {
     '@lobehub/ui',
     '@lobehub/fluent-emoji',
     'antd',
-    'react-layout-kit'
+    'react-layout-kit',
+    'echarts',
+    'zrender',
+    'echarts-for-react'
   ],
   async headers() {
     return [

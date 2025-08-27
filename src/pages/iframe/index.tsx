@@ -1,13 +1,12 @@
 // 引入 Framer Motion 的核心组件
 import { motion, AnimatePresence } from 'framer-motion';
 import '@ant-design/v5-patch-for-react-19';
-import { App, Button, Card, ConfigProvider, DatePicker, Radio, Space, Steps, Switch, theme, Typography } from 'antd';
+// 引入 Select 和 Radio 组件
+import { App, Button, Card, ConfigProvider, DatePicker, Radio, Select, Steps, Switch, theme, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { memo, useEffect, useState } from 'react';
-import { Center, Flexbox } from 'react-layout-kit';
-// 暂时移除 echarts/core 的导入来修复 SSR 编译错误
-// import * as echarts from 'echarts/core';
-
+import { Flexbox } from 'react-layout-kit';
+import * as echarts from 'echarts/core';
 
 import EChartRender from '@/components/EChartRender';
 import TableRender from '@/components/TableRender';
@@ -16,21 +15,14 @@ import { mockBIResult } from '@/services/mock';
 const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 
-// ========================================================================
-// ========= 核心改动：替换为美化版的 generateChartOption 函数 =========
-// ========================================================================
+// ... generateChartOption 函数保持不变 ...
 const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie') => {
   if (!tableData || tableData.length === 0) return {};
-
   const columns = Object.keys(tableData[0]);
   const categoryColumn = columns[0];
   const valueColumn = columns[1];
-  
-  // 1. 定义一组更现代、更漂亮的颜色
   const colorPalette = ['#5470C6', '#91CC75', '#EE6666', '#73C0DE', '#3BA272', '#FC8452'];
-
   let option = {};
-
   switch (chartType) {
     case 'bar':
       option = {
@@ -40,22 +32,20 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
           name: valueColumn,
           type: 'bar',
           data: tableData.map(row => row[valueColumn]),
-          // 2. 美化柱状图样式
           itemStyle: {
-            borderRadius: [4, 4, 0, 0], // 顶部圆角
-            color: colorPalette[0], // 临时修复：使用纯色代替渐变色
-            shadowColor: 'rgba(0, 0, 0, 0.2)', // 阴影
+            borderRadius: [4, 4, 0, 0],
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: colorPalette[0] }, { offset: 1, color: '#91CC75' }]),
+            shadowColor: 'rgba(0, 0, 0, 0.2)',
             shadowBlur: 5,
           },
           emphasis: {
             itemStyle: {
-              color: colorPalette[3], // 临时修复：高亮时使用另一种纯色
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#73C0DE' }, { offset: 1, color: colorPalette[0] }]),
             }
           }
         }],
       };
       break;
-
     case 'line':
       option = {
         xAxis: { type: 'category', data: tableData.map(row => row[categoryColumn]) },
@@ -64,7 +54,6 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
           name: valueColumn,
           type: 'line',
           data: tableData.map(row => row[valueColumn]),
-          // 3. 美化折线图样式
           smooth: true,
           symbol: 'circle',
           symbolSize: 8,
@@ -75,44 +64,27 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
             shadowBlur: 10,
             shadowOffsetY: 8,
           },
-          // 临时修复：暂时移除渐变填充区域
-          // areaStyle: { ... }
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(238, 102, 102, 0.5)' }, { offset: 1, color: 'rgba(238, 102, 102, 0)' }])
+          },
         }],
       };
       break;
-      
     case 'pie':
       option = {
         series: [{
           name: categoryColumn,
           type: 'pie',
-          radius: ['40%', '70%'], // 改为环形图，更美观
+          radius: ['40%', '70%'],
           avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 10,
-            borderColor: '#fff',
-            borderWidth: 2
-          },
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '20',
-              fontWeight: 'bold'
-            }
-          },
-          data: tableData.map(row => ({
-            name: row[categoryColumn],
-            value: row[valueColumn],
-          })),
+          itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+          label: { show: false, position: 'center' },
+          emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
+          data: tableData.map(row => ({ name: row[categoryColumn], value: row[valueColumn] })),
         }],
       };
       break;
   }
-  
   return {
     ...option,
     title: { text: `按'${categoryColumn}'分析'${valueColumn}'`, left: 'center' },
@@ -125,14 +97,9 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
       borderWidth: 1,
       textStyle: { color: '#333' },
     },
-    legend: {
-      show: chartType === 'pie', // 只在饼图时显示图例
-      orient: 'vertical',
-      left: 'left',
-    },
+    legend: { show: chartType === 'pie', orient: 'vertical', left: 'left' },
   };
 };
-
 
 const Render = memo(() => {
   const [biResult, setBiResult] = useState<any>();
@@ -167,10 +134,10 @@ const Render = memo(() => {
     }
   }, [biResult, chartType]);
 
+  // ✅ 核心修复：移除了 cardAnimation 对象的 Variants 类型注解
   const cardAnimation = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, ease: 'easeInOut' },
   };
 
   const steps = [
@@ -178,11 +145,33 @@ const Render = memo(() => {
       title: '筛选条件',
       description: (
         <motion.div {...cardAnimation}>
+          {/* 核心修改：丰富了筛选条件的内容 */}
           <Card size="small">
-            <Space direction="vertical">
-              <Text>数据时间:</Text>
-              <RangePicker defaultValue={[dayjs(), dayjs()]} />
-            </Space>
+            <Flexbox gap={16} direction="vertical">
+              <Flexbox horizontal align="center" gap={8}>
+                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
+                <Select
+                  defaultValue="sales_data"
+                  style={{ flex: 1 }}
+                  options={[
+                    { value: 'sales_data', label: '销售数据' },
+                    { value: 'user_data', label: '用户数据' },
+                    { value: 'marketing_data', label: '营销数据' },
+                  ]}
+                />
+              </Flexbox>
+              <Flexbox horizontal align="center" gap={8}>
+                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>查询模式:</Text>
+                <Radio.Group defaultValue="aggregate">
+                  <Radio.Button value="aggregate">聚合模式</Radio.Button>
+                  <Radio.Button value="detail">明细模式</Radio.Button>
+                </Radio.Group>
+              </Flexbox>
+              <Flexbox horizontal align="center" gap={8}>
+                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据时间:</Text>
+                <RangePicker style={{ flex: 1 }} defaultValue={[dayjs(), dayjs()]} />
+              </Flexbox>
+            </Flexbox>
           </Card>
         </motion.div>
       ),

@@ -59,7 +59,7 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
           symbolSize: 8,
           lineStyle: {
             color: colorPalette[2],
-            width: 3,
+            width: 2,
             shadowColor: 'rgba(0, 0, 0, 0.3)',
             shadowBlur: 10,
             shadowOffsetY: 8,
@@ -149,27 +149,8 @@ const Render = memo(() => {
           <Card size="small">
             <Flexbox gap={16} direction="vertical">
               <Flexbox horizontal align="center" gap={8}>
-                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
-                <Select
-                  defaultValue="sales_data"
-                  style={{ flex: 1 }}
-                  options={[
-                    { value: 'sales_data', label: '销售数据' },
-                    { value: 'user_data', label: '用户数据' },
-                    { value: 'marketing_data', label: '营销数据' },
-                  ]}
-                />
-              </Flexbox>
-              <Flexbox horizontal align="center" gap={8}>
-                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>查询模式:</Text>
-                <Radio.Group defaultValue="aggregate">
-                  <Radio.Button value="aggregate">聚合模式</Radio.Button>
-                  <Radio.Button value="detail">明细模式</Radio.Button>
-                </Radio.Group>
-              </Flexbox>
-              <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据时间:</Text>
-                <RangePicker style={{ flex: 1 }} defaultValue={[dayjs(), dayjs()]} />
+                <RangePicker style={{ width: 260 }} defaultValue={[dayjs(), dayjs()]} />
               </Flexbox>
             </Flexbox>
           </Card>

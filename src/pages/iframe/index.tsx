@@ -8,9 +8,13 @@ import { memo, useEffect, useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 import * as echarts from 'echarts/core';
 
+// 1. 引入 LobeChat SDK 和新的 n8n 服务
+import { lobeChat } from '@lobehub/chat-plugin-sdk/client';
+import { fetchBIAnalysis } from '@/services/n8n';
+
 import EChartRender from '@/components/EChartRender';
 import TableRender from '@/components/TableRender';
-import { mockBIResult } from '@/services/mock';
+// import { mockBIResult } from '@/services/mock'; // 不再直接需要 mock 数据
 
 const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
@@ -59,7 +63,7 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
           symbolSize: 8,
           lineStyle: {
             color: colorPalette[2],
-            width: 2,
+            width: 3,
             shadowColor: 'rgba(0, 0, 0, 0.3)',
             shadowBlur: 10,
             shadowOffsetY: 8,
@@ -109,20 +113,46 @@ const Render = memo(() => {
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const [chartOption, setChartOption] = useState<object | undefined>();
   const [view, setView] = useState<'chart' | 'table'>('chart');
+  
+  // 2. 新增 state 用于存储从 LobeChat 接收的 payload
+  const [payload, setPayload] = useState<any>();
 
-  const runAnalysis = () => {
+  // 3. 重新引入 useEffect 来接收 LobeChat 的 payload
+  useEffect(() => {
+    lobeChat.getPluginPayload().then((payload) => {
+      if (payload && payload.name === 'generateChart') { // 确保函数名与 manifest 一致
+        console.log('接收到 LobeChat payload:', payload.arguments);
+        setPayload(payload.arguments);
+      }
+    });
+  }, []);
+
+  // 4. 修改 runAnalysis 函数，使其调用 n8n 服务
+  const runAnalysis = async () => {
+    if (!payload) {
+      // 在实际应用中，可以换成更友好的提示，例如 antd 的 message.warning
+      alert('没有从 LobeChat 接收到分析指令');
+      return;
+    }
+
     setLoading(true);
     setCurrentStep(0);
     setStepStatus('process');
     setBiResult(undefined);
+
+    // 调用 n8n 服务并传递 payload
+    const result = await fetchBIAnalysis(payload);
+    
+    // 模拟分步展示
     setTimeout(() => {
       setCurrentStep(1);
-      setBiResult({ sql: mockBIResult.sql });
+      setBiResult({ sql: result.sql });
     }, 500);
+
     setTimeout(() => {
       setCurrentStep(2);
-      setBiResult(mockBIResult);
-      setStepStatus('finish');
+      setBiResult(result);
+      setStepStatus(result.error ? 'error' : 'finish'); // 如果 n8n 返回错误，则步骤条显示错误状态
       setLoading(false);
     }, 1500);
   };
@@ -134,23 +164,45 @@ const Render = memo(() => {
     }
   }, [biResult, chartType]);
 
-  // ✅ 核心修复：移除了 cardAnimation 对象的 Variants 类型注解
-  const cardAnimation = {
+  const cardVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
+  };
+
+  const cardTransition = {
+    duration: 0.5,
+    ease: 'easeInOut',
   };
 
   const steps = [
     {
       title: '筛选条件',
       description: (
-        <motion.div {...cardAnimation}>
-          {/* 核心修改：丰富了筛选条件的内容 */}
+        <motion.div variants={cardVariants} initial="initial" animate="animate" transition={cardTransition}>
           <Card size="small">
-            <Flexbox gap={16} direction="vertical">
+            <Flexbox gap={16} direction="column">
+              <Flexbox horizontal align="center" gap={8}>
+                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
+                <Select
+                  defaultValue="sales_data"
+                  style={{ flex: 1 }}
+                  options={[
+                    { value: 'sales_data', label: '销售数据' },
+                    { value: 'user_data', label: '用户数据' },
+                    { value: 'marketing_data', label: '营销数据' },
+                  ]}
+                />
+              </Flexbox>
+              <Flexbox horizontal align="center" gap={8}>
+                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>查询模式:</Text>
+                <Radio.Group defaultValue="aggregate">
+                  <Radio.Button value="aggregate">聚合模式</Radio.Button>
+                  <Radio.Button value="detail">明细模式</Radio.Button>
+                </Radio.Group>
+              </Flexbox>
               <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据时间:</Text>
-                <RangePicker style={{ width: 260 }} defaultValue={[dayjs(), dayjs()]} />
+                <RangePicker style={{ flex: 1 }} defaultValue={[dayjs(), dayjs()]} />
               </Flexbox>
             </Flexbox>
           </Card>
@@ -160,7 +212,7 @@ const Render = memo(() => {
     {
       title: 'SQL 语句',
       description: biResult?.sql ? (
-        <motion.div {...cardAnimation}>
+        <motion.div variants={cardVariants} initial="initial" animate="animate" transition={cardTransition}>
           <Card size="small">
             <Paragraph>
               <pre style={{ margin: 0, background: '#fafafa', padding: '8px 12px', borderRadius: 4, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
@@ -174,7 +226,7 @@ const Render = memo(() => {
     {
       title: '数据查询与可视化',
       description: biResult?.data ? (
-        <motion.div {...cardAnimation}>
+        <motion.div variants={cardVariants} initial="initial" animate="animate" transition={cardTransition}>
           <Card
             size="small"
             extra={<Switch checkedChildren="图表" unCheckedChildren="表格" checked={view === 'chart'} onChange={(checked) => setView(checked ? 'chart' : 'table')} />}
@@ -207,8 +259,8 @@ const Render = memo(() => {
       <App>
         <Flexbox style={{ padding: '16px', background: '#f5f7fa', minHeight: '100vh' }} gap={16}>
           <Card size="small">
-            <Button type="primary" onClick={runAnalysis} loading={loading}>
-              {loading ? '分析中...' : '加载数据并分析'}
+            <Button type="primary" onClick={runAnalysis} loading={loading} disabled={!payload}>
+              {loading ? '分析中...' : (payload ? '开始分析' : '等待 LobeChat 指令...')}
             </Button>
           </Card>
           

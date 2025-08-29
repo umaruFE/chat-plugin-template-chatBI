@@ -6,7 +6,6 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
   // eslint-disable-next-line no-console
   console.log('成功从 URL 中获取 webhookId:', webhookId);
   if (!webhookId) {
-    console.warn('⚠️ 未能从插件设置中获取 webhookId，将返回 mock 数据。');
     return mockBIResult;
   }
 
@@ -17,7 +16,6 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
   const webhookUrl = process.env[envVarName];
 
   if (!webhookUrl || !webhookUrl.startsWith('http')) {
-    console.warn(`⚠️ 环境变量 ${envVarName} 未配置或无效，将返回 mock 数据。`);
     return mockBIResult;
   }
 
@@ -43,7 +41,6 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error('调用 n8n 工作流时出错:', error);
     return {
       ...mockBIResult,
       error: '调用 n8n 失败，已使用 mock 数据代替。',

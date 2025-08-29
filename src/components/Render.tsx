@@ -12,7 +12,9 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-const Render = memo<Partial<ResponseData>>(({ mood, clothes, today }) => {
+// ✅ 核心修复：将 memo 包裹的匿名函数改为具名函数表达式
+// 这样 React DevTools 和 ESLint 都能识别组件的名称
+const Render = memo(function Render({ mood, clothes, today }: Partial<ResponseData>) {
   const { styles } = useStyles();
 
   return (

@@ -14,7 +14,6 @@ import { fetchBIAnalysis } from '@/services/n8n';
 
 import EChartRender from '@/components/EChartRender';
 import TableRender from '@/components/TableRender';
-// import { mockBIResult } from '@/services/mock'; // 不再直接需要 mock 数据
 
 const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
@@ -114,23 +113,19 @@ const Render = memo(() => {
   const [chartOption, setChartOption] = useState<object | undefined>();
   const [view, setView] = useState<'chart' | 'table'>('chart');
   
-  // 2. 新增 state 用于存储从 LobeChat 接收的 payload
   const [payload, setPayload] = useState<any>();
 
-  // 3. 重新引入 useEffect 来接收 LobeChat 的 payload
   useEffect(() => {
     lobeChat.getPluginPayload().then((payload) => {
-      if (payload && payload.name === 'generateChart') { // 确保函数名与 manifest 一致
+      if (payload && payload.name === 'generateChart') {
         console.log('接收到 LobeChat payload:', payload.arguments);
         setPayload(payload.arguments);
       }
     });
   }, []);
 
-  // 4. 修改 runAnalysis 函数，使其调用 n8n 服务
   const runAnalysis = async () => {
     if (!payload) {
-      // 在实际应用中，可以换成更友好的提示，例如 antd 的 message.warning
       alert('没有从 LobeChat 接收到分析指令');
       return;
     }
@@ -140,10 +135,8 @@ const Render = memo(() => {
     setStepStatus('process');
     setBiResult(undefined);
 
-    // 调用 n8n 服务并传递 payload
     const result = await fetchBIAnalysis(payload);
     
-    // 模拟分步展示
     setTimeout(() => {
       setCurrentStep(1);
       setBiResult({ sql: result.sql });
@@ -152,7 +145,7 @@ const Render = memo(() => {
     setTimeout(() => {
       setCurrentStep(2);
       setBiResult(result);
-      setStepStatus(result.error ? 'error' : 'finish'); // 如果 n8n 返回错误，则步骤条显示错误状态
+      setStepStatus(result.error ? 'error' : 'finish');
       setLoading(false);
     }, 1500);
   };
@@ -164,6 +157,7 @@ const Render = memo(() => {
     }
   }, [biResult, chartType]);
 
+  // ✅ 核心修复：分离动画的“状态”和“过程”
   const cardVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -178,9 +172,10 @@ const Render = memo(() => {
     {
       title: '筛选条件',
       description: (
+        // ✅ 核心修复：分别传递 variants 和 transition 属性
         <motion.div variants={cardVariants} initial="initial" animate="animate" transition={cardTransition}>
           <Card size="small">
-            <Flexbox gap={16} direction="column">
+            <Flexbox gap={16} direction="vertical">
               <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
                 <Select

@@ -16,7 +16,6 @@ import {
   Typography,
   theme,
 } from 'antd';
-import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts/core';
 import { AnimatePresence, Transition, motion } from 'framer-motion';

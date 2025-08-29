@@ -130,8 +130,8 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
   };
 };
 
-// ✅ 核心修复 1: 将组件定义为一个独立的、具名的函数
-const RenderComponent = () => {
+// ✅ 核心修复 1: 使用具名函数表达式来修复 display-name 错误
+const Render = memo(function Render() {
   const [biResult, setBiResult] = useState<any>();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -140,12 +140,12 @@ const RenderComponent = () => {
   const [chartOption, setChartOption] = useState<object | undefined>();
   const [view, setView] = useState<'chart' | 'table'>('chart');
 
-  const [payload, setPayload] = useState<{ name: string; arguments: any }>();
+  const [payload, setPayload] = useState<any>();
 
   useEffect(() => {
-    lobeChat.getPluginPayload().then((payload: { name: string; arguments: any }) => {
+    // ✅ 核心修复：移除了 payload 参数后面不正确的类型声明
+    lobeChat.getPluginPayload().then((payload) => {
       if (payload && payload.name === 'generateChart') {
-        // ✅ 核心修复 2: 确保 console.log 在提交时被注释或删除
         // console.log('接收到 LobeChat payload:', payload.arguments);
         setPayload(payload.arguments);
       }
@@ -335,12 +335,6 @@ const RenderComponent = () => {
       </App>
     </ConfigProvider>
   );
-};
-
-// ✅ 核心修复 1: 为组件明确设置 displayName
-RenderComponent.displayName = 'RenderComponent';
-
-// ✅ 核心修复 1: 使用 memo 包裹这个具名的组件
-const Render = memo(RenderComponent);
+});
 
 export default Render;

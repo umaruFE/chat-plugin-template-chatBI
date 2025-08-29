@@ -1,0 +1,35 @@
+{
+  "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
+  "api": [
+    {
+      "url": "http://localhost:3400/api/chart",
+      "name": "generateChart--wuliu",
+      "description": "当用户想要进行数据分析或需要将数据可视化时，调用此工具。它可以理解用户的自然语言查询，并生成一个图表。",
+      "parameters": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "用户用自然语言提出的数据分析请求。例如：‘上个月各类产品的销售额趋势’或‘不同城市的用户分布情况’。"
+          }
+        },
+        "required": ["query"],
+        "type": "object"
+      }
+    }
+  ],
+  "author": "Your Name",
+  "createdAt": "2025-08-26",
+  "identifier": "chat-bi-plugin",
+  "meta": {
+    "avatar": "📊",
+    "tags": ["BI", "data", "chart", "analysis"],
+    "title": "DeepBI 物流数据分析",
+    "description": "一个能够理解自然语言、进行数据分析并生成可视化图表的智能插件。"
+  },
+  "type": "standalone",
+  "ui": {
+    "url": "http://localhost:3400/iframe",
+    "height": 450
+  },
+  "version": "1"
+}

@@ -3,7 +3,7 @@
   "api": [
     {
       "url": "http://localhost:3400/api/chart",
-      "name": "generateChart--shengwuzhiyao",
+      "name": "generateChart--wuliu",
       "description": "当用户想要进行数据分析或需要将数据可视化时，调用此工具。它可以理解用户的自然语言查询，并生成一个图表。",
       "parameters": {
         "properties": {
@@ -19,16 +19,16 @@
   ],
   "author": "Your Name",
   "createdAt": "2025-08-26",
-  "identifier": "chat-bi-plugin",
+  "identifier": "deep-bi-plugin-wl",
   "meta": {
     "avatar": "📊",
     "tags": ["BI", "data", "chart", "analysis"],
-    "title": "DeepBI 生物制药数据分析",
+    "title": "DeepBI 物流数据分析",
     "description": "一个能够理解自然语言、进行数据分析并生成可视化图表的智能插件。"
   },
   "type": "standalone",
   "ui": {
-    "url": "https://chat-plugin-template-chat-bi.vercel.app/iframe?webhookId=SWZY",
+    "url": "https://chat-plugin-template-chat-bi.vercel.app/iframe?webhookId=WL",
     "height": 450,
     "width": 900
   },

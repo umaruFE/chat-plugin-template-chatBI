@@ -28,8 +28,9 @@
   },
   "type": "standalone",
   "ui": {
-    "url": "http://localhost:3400/iframe",
-    "height": 450
+    "url": "http://localhost:3400/iframe?webhookId=GYL",
+    "height": 450,
+    "width": 900
   },
   "version": "1"
 }

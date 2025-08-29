@@ -28,8 +28,9 @@
   },
   "type": "standalone",
   "ui": {
-    "url": "http://localhost:3400/iframe",
-    "height": 450
+    "url": "https://chat-plugin-template-chat-bi.vercel.app/iframe?webhookId=ZNZZ",
+    "height": 450,
+    "width": 900
   },
   "version": "1"
 }

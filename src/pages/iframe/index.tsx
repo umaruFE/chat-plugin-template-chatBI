@@ -16,6 +16,7 @@ import {
   Typography,
   theme,
 } from 'antd';
+import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts/core';
 import { AnimatePresence, Transition, motion } from 'framer-motion';
@@ -130,7 +131,7 @@ const generateChartOption = (tableData: any[], chartType: 'bar' | 'line' | 'pie'
   };
 };
 
-// ✅ 核心修复 1: 使用具名函数表达式来修复 display-name 错误
+// ✅ 使用具名函数表达式来修复 display-name 错误
 const Render = memo(function Render() {
   const [biResult, setBiResult] = useState<any>();
   const [loading, setLoading] = useState(false);
@@ -142,8 +143,12 @@ const Render = memo(function Render() {
 
   const [payload, setPayload] = useState<any>();
 
+  // ✅ 新增状态来管理筛选器的值
+  const [dataset, setDataset] = useState('sales_data');
+  const [queryMode, setQueryMode] = useState('aggregate');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([dayjs(), dayjs()]);
+
   useEffect(() => {
-    // ✅ 核心修复：移除了 payload 参数后面不正确的类型声明
     lobeChat.getPluginPayload().then((payload) => {
       if (payload && payload.name === 'generateChart') {
         // console.log('接收到 LobeChat payload:', payload.arguments);
@@ -154,6 +159,7 @@ const Render = memo(function Render() {
 
   const runAnalysis = async () => {
     if (!payload) {
+      // eslint-disable-next-line no-alert
       alert('没有从 LobeChat 接收到分析指令');
       return;
     }
@@ -163,7 +169,22 @@ const Render = memo(function Render() {
     setStepStatus('process');
     setBiResult(undefined);
 
-    const result = await fetchBIAnalysis(payload);
+    // ✅ 核心修改：在调用 n8n 之前，先获取插件的设置
+
+    const analysisPayload = {
+      ...payload,
+      filters: {
+        dataset,
+        queryMode,
+        dateRange: dateRange.map((d) => d.format('YYYY-MM-DD')),
+      },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const webhookId = params.get('webhookId') || '';
+
+    // ✅ 核心修改：将获取到的 webhookId 作为第二个参数传递给 n8n 服务
+    const result = await fetchBIAnalysis(analysisPayload, webhookId);
 
     setTimeout(() => {
       setCurrentStep(1);
@@ -209,8 +230,10 @@ const Render = memo(function Render() {
             <Flexbox gap={16} direction="vertical">
               <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
+                {/* ✅ 变为受控组件 */}
                 <Select
-                  defaultValue="sales_data"
+                  value={dataset}
+                  onChange={setDataset}
                   style={{ flex: 1 }}
                   options={[
                     { value: 'sales_data', label: '销售数据' },
@@ -221,14 +244,24 @@ const Render = memo(function Render() {
               </Flexbox>
               <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>查询模式:</Text>
-                <Radio.Group defaultValue="aggregate">
+                {/* ✅ 变为受控组件 */}
+                <Radio.Group value={queryMode} onChange={(e) => setQueryMode(e.target.value)}>
                   <Radio.Button value="aggregate">聚合模式</Radio.Button>
                   <Radio.Button value="detail">明细模式</Radio.Button>
                 </Radio.Group>
               </Flexbox>
               <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据时间:</Text>
-                <RangePicker style={{ flex: 1 }} defaultValue={[dayjs(), dayjs()]} />
+                {/* ✅ 变为受控组件 */}
+                <RangePicker
+                  value={dateRange}
+                  onChange={(dates) => {
+                    if (dates) {
+                      setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs]);
+                    }
+                  }}
+                  style={{ flex: 1 }}
+                />
               </Flexbox>
             </Flexbox>
           </Card>

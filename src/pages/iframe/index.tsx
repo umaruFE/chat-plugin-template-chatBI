@@ -149,7 +149,14 @@ const Render = memo(function Render() {
 
   useEffect(() => {
     lobeChat.getPluginPayload().then((payload) => {
-      if (payload && payload.name === 'generateChart') {
+      if (
+        payload &&
+        (payload.name === 'generateChart' ||
+          payload.name === 'generateChart--wuliu' ||
+          payload.name === 'generateChart--gongyinglian' ||
+          payload.name === 'generateChart--shengwuzhiyao' ||
+          payload.name === 'generateChart--zhinengzhizao')
+      ) {
         // console.log('接收到 LobeChat payload:', payload.arguments);
         setPayload(payload.arguments);
       }

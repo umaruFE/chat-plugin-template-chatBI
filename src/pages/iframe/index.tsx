@@ -142,8 +142,6 @@ const Render = memo(function Render() {
   const [payload, setPayload] = useState<any>();
 
   // ✅ 新增状态来管理筛选器的值
-  const [dataset, setDataset] = useState('sales_data');
-  const [queryMode, setQueryMode] = useState('aggregate');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([dayjs(), dayjs()]);
 
   useEffect(() => {

@@ -1,12 +1,12 @@
 import { mockBIResult } from './mock';
 
-// ✅ 核心修改：创建一个 Webhook URL 的映射表
+// ✅ 核心修改：使用标准的、不带端口号的 HTTPS 域名
 const webhookUrlMap: Record<string, string> = {
-  XQY: 'http://8.130.93.151:5678/webhook/4e2370bd-25b6-419d-856c-6c179fa17e3a',
-  WL: 'http://8.130.93.151:5678/webhook/45df2d4e-71df-45d1-b0b3-801fb28d3304',
-  GYL: 'http://8.130.93.151:5678/webhook/234d6bfa-a43d-4043-a4e0-09637679b971',
-  SWZY: 'http://8.130.93.151:5678/webhook/d721eb7e-7fde-4fad-9e52-b5caa1763968',
-  ZNZZ: 'http://8.130.93.151:5678/webhook/0ead941d-3313-4731-bd48-dae98ba9d65a',
+  XQY: 'https://guixu.chat/webhook/4e2370bd-25b6-41d-856c-6c179fa17e3a',
+  WL: 'https://guixu.chat/webhook/45df2d4e-71df-45d1-b0b3-801fb28d3304',
+  GYL: 'https://guixu.chat/webhook/234d6bfa-a43d-4043-a4e0-09637679b971',
+  SWZY: 'https://guixu.chat/webhook/d721eb7e-7fde-4fad-9e52-b5caa1763968',
+  ZNZZ: 'https://guixu.chat/webhook/0ead941d-3313-4731-bd48-dae98ba9d65a',
 };
 
 export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
@@ -16,7 +16,6 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
     return mockBIResult;
   }
 
-  // ✅ 核心修改：从我们写死的映射表中查找 URL
   const webhookUrl = webhookUrlMap[webhookId];
 
   if (!webhookUrl) {

@@ -158,7 +158,7 @@ const Render = memo(function Render() {
           payload.name === 'generateChart--zhinengzhizao')
       ) {
         // console.log('接收到 LobeChat payload:', payload.arguments);
-        setPayload(payload.arguments);
+        setPayload({ query: '我有多少客户' });
       }
     });
   }, []);

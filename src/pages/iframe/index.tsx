@@ -235,28 +235,6 @@ const Render = memo(function Render() {
           <Card size="small">
             <Flexbox gap={16} direction="vertical">
               <Flexbox horizontal align="center" gap={8}>
-                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据集:</Text>
-                {/* ✅ 变为受控组件 */}
-                <Select
-                  value={dataset}
-                  onChange={setDataset}
-                  style={{ flex: 1 }}
-                  options={[
-                    { value: 'sales_data', label: '销售数据' },
-                    { value: 'user_data', label: '用户数据' },
-                    { value: 'marketing_data', label: '营销数据' },
-                  ]}
-                />
-              </Flexbox>
-              <Flexbox horizontal align="center" gap={8}>
-                <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>查询模式:</Text>
-                {/* ✅ 变为受控组件 */}
-                <Radio.Group value={queryMode} onChange={(e) => setQueryMode(e.target.value)}>
-                  <Radio.Button value="aggregate">聚合模式</Radio.Button>
-                  <Radio.Button value="detail">明细模式</Radio.Button>
-                </Radio.Group>
-              </Flexbox>
-              <Flexbox horizontal align="center" gap={8}>
                 <Text style={{ width: 80, textAlign: 'right', flexShrink: 0 }}>数据时间:</Text>
                 {/* ✅ 变为受控组件 */}
                 <RangePicker

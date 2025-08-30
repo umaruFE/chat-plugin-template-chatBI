@@ -1,8 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// 1. 引入 uuid 库
-import { mockBIResult } from './mock';
-
 // ... webhookUrlMap 保持不变 ...
 const webhookUrlMap: Record<string, string> = {
   XQY: 'https://guixu.chat/n8n/webhook/4e2370bd-25b6-41d-856c-6c179fa17e3a',
@@ -16,7 +13,7 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
   if (!webhookId) {
     // eslint-disable-next-line no-console
     console.warn('⚠️ 未提供 webhookId，将返回 mock 数据。');
-    return mockBIResult;
+    return '没有数据，请更换条件重新查询';
   }
 
   const webhookUrl = webhookUrlMap[webhookId];
@@ -24,7 +21,7 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
   if (!webhookUrl) {
     // eslint-disable-next-line no-console
     console.warn(`⚠️ 未在映射表中找到 ID 为 "${webhookId}" 的 Webhook URL，将返回 mock 数据。`);
-    return mockBIResult;
+    return '没有数据，请更换条件重新查询';
   }
 
   try {
@@ -53,7 +50,7 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
     // eslint-disable-next-line no-console
     console.error('调用 n8n 工作流时出错:', error);
     return {
-      ...mockBIResult,
+      ...{ data: '没有数据，请更换条件重新查询' },
       error: '调用 n8n 失败，已使用 mock 数据代替。',
     };
   }

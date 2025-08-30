@@ -1,6 +1,9 @@
+import { v4 as uuidv4 } from 'uuid';
+
+// 1. 引入 uuid 库
 import { mockBIResult } from './mock';
 
-// ✅ 核心修改：使用标准的、不带端口号的 HTTPS 域名
+// ... webhookUrlMap 保持不变 ...
 const webhookUrlMap: Record<string, string> = {
   XQY: 'https://guixu.chat/n8n/webhook/4e2370bd-25b6-41d-856c-6c179fa17e3a',
   WL: 'https://guixu.chat/n8n/webhook/45df2d4e-71df-45d1-b0b3-801fb28d3304',
@@ -25,7 +28,8 @@ export const fetchBIAnalysis = async (payload: any, webhookId?: string) => {
   }
 
   try {
-    const sessionId = crypto.randomUUID();
+    // 2. 核心修复：使用 uuid 库生成唯一 ID
+    const sessionId = uuidv4();
     const body = {
       ...payload,
       sessionId: sessionId,

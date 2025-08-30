@@ -10,7 +10,6 @@ import {
   ConfigProvider,
   DatePicker,
   Radio,
-  Select,
   Steps,
   Switch,
   Typography,

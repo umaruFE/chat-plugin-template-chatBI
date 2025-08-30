@@ -156,6 +156,7 @@ const Render = memo(function Render() {
       ) {
         // console.log('接收到 LobeChat payload:', payload.arguments);
         setPayload(payload.arguments);
+        runAnalysis();
       }
     });
   }, []);
@@ -328,11 +329,11 @@ const Render = memo(function Render() {
     <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}>
       <App>
         <Flexbox style={{ padding: '16px', background: '#f5f7fa', minHeight: '100vh' }} gap={16}>
-          <Card size="small">
+          {/* <Card size="small">
             <Button type="primary" onClick={runAnalysis} loading={loading} disabled={!payload}>
               {loading ? '分析中...' : payload ? '开始分析' : '等待 LobeChat 指令...'}
             </Button>
-          </Card>
+          </Card> */}
 
           <AnimatePresence>
             <Steps

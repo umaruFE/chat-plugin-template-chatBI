@@ -177,8 +177,6 @@ const Render = memo(function Render() {
     const analysisPayload = {
       ...payload,
       filters: {
-        dataset,
-        queryMode,
         dateRange: dateRange.map((d) => d.format('YYYY-MM-DD')),
       },
     };
